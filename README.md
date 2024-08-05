@@ -3,7 +3,7 @@ payload = {
             "token": "?",
             "data": {
                 "service_url": "?",
-                "panele_id": "15",
+                "panele_id": "?",
                 "asterisk_url": "?",
                 "addr": "TEST",
                 "rtsp": "?",
