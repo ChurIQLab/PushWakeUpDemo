@@ -7,35 +7,39 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0F8B11492C5F82CE00DE7FB5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F8B11482C5F82CE00DE7FB5 /* AppDelegate.swift */; };
-		0F8B114D2C5F82CE00DE7FB5 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F8B114C2C5F82CE00DE7FB5 /* MainViewController.swift */; };
+		0C689B7F5B68A9A0642574AB /* AppDelegate+PushRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAECC7FC47FCA2D183480926 /* AppDelegate+PushRegistration.swift */; };
 		0F8B11522C5F82CF00DE7FB5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0F8B11512C5F82CF00DE7FB5 /* Assets.xcassets */; };
 		0F8B11552C5F82CF00DE7FB5 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 0F8B11542C5F82CF00DE7FB5 /* Base */; };
-		0F8B115D2C5F832E00DE7FB5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0F8B115C2C5F832E00DE7FB5 /* GoogleService-Info.plist */; };
-		0F8B11602C5F838F00DE7FB5 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 0F8B115F2C5F838F00DE7FB5 /* FirebaseAnalytics */; };
-		0F8B11622C5F838F00DE7FB5 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 0F8B11612C5F838F00DE7FB5 /* FirebaseAuth */; };
 		0F8B11642C5F838F00DE7FB5 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 0F8B11632C5F838F00DE7FB5 /* FirebaseMessaging */; };
-		0F8B11792C5FB57D00DE7FB5 /* SIPService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F8B11782C5FB57D00DE7FB5 /* SIPService.swift */; };
-		0F8B117B2C5FB59B00DE7FB5 /* IncomingCallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F8B117A2C5FB59B00DE7FB5 /* IncomingCallViewController.swift */; };
-		0F8B11802C5FC67900DE7FB5 /* LoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F8B117F2C5FC67900DE7FB5 /* LoaderView.swift */; };
-		0F8B11822C60E63800DE7FB5 /* PushNotificationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F8B11812C60E63800DE7FB5 /* PushNotificationData.swift */; };
-		0F8B11872C61036900DE7FB5 /* NotificationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F8B11862C61036900DE7FB5 /* NotificationType.swift */; };
+		0FA95BF930682D4100F467EB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0FA95BF830682D4100F467EB /* GoogleService-Info.plist */; };
+		1438D8B0D02E6A9712CA431B /* AppDelegate+NotificationHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57AC77D4404EBA26DD494CC8 /* AppDelegate+NotificationHandling.swift */; };
+		166A3194CFF1516B73F0C36F /* CallPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4235722C60C9E1376633649E /* CallPreviewViewController.swift */; };
+		47746F7DDD5AB1DB490F8439 /* PushNotificationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC57BD88413216BE2A44A23A /* PushNotificationData.swift */; };
+		47CBD78E16FFA8B405023256 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E1DC98E222F64A432C792F /* AppDelegate.swift */; };
+		6C8544ECFA41589BDBA3648E /* EventLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0CAD10D4BC0B141AD746611 /* EventLog.swift */; };
+		CC04A60DE9FC66D0FCDAAF86 /* NotificationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2A3D645103E31E8657377B /* NotificationType.swift */; };
+		CCFD609DF7927FAF486B2EC2 /* FCMTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D99F85BA05607DF6344C7F /* FCMTokenStore.swift */; };
+		FB3E23375C883AEB4D3BE876 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7246BC6BB74033CC9FFAC1FE /* MainViewController.swift */; };
+		FF23C9462109876E6A1FBB5D /* customSound.wav in Resources */ = {isa = PBXBuildFile; fileRef = EFE3D694FA4A35ACB1DDF8CE /* customSound.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0F8B11452C5F82CE00DE7FB5 /* OnlineCubeCallDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OnlineCubeCallDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		0F8B11482C5F82CE00DE7FB5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		0F8B114C2C5F82CE00DE7FB5 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		0F8B11452C5F82CE00DE7FB5 /* PushWakeUpDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PushWakeUpDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0F8B11512C5F82CF00DE7FB5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0F8B11542C5F82CF00DE7FB5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0F8B11562C5F82CF00DE7FB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		0F8B115C2C5F832E00DE7FB5 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		0F8B11782C5FB57D00DE7FB5 /* SIPService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SIPService.swift; sourceTree = "<group>"; };
-		0F8B117A2C5FB59B00DE7FB5 /* IncomingCallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingCallViewController.swift; sourceTree = "<group>"; };
-		0F8B117F2C5FC67900DE7FB5 /* LoaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoaderView.swift; sourceTree = "<group>"; };
-		0F8B11812C60E63800DE7FB5 /* PushNotificationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationData.swift; sourceTree = "<group>"; };
-		0F8B11852C60EAA000DE7FB5 /* OnlineCubeCallDemoDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OnlineCubeCallDemoDebug.entitlements; sourceTree = "<group>"; };
-		0F8B11862C61036900DE7FB5 /* NotificationType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationType.swift; sourceTree = "<group>"; };
+		0F8B11852C60EAA000DE7FB5 /* PushWakeUpDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PushWakeUpDemo.entitlements; sourceTree = "<group>"; };
+		0FA95BF830682D4100F467EB /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		35D99F85BA05607DF6344C7F /* FCMTokenStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FCMTokenStore.swift; sourceTree = "<group>"; };
+		4235722C60C9E1376633649E /* CallPreviewViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CallPreviewViewController.swift; sourceTree = "<group>"; };
+		57AC77D4404EBA26DD494CC8 /* AppDelegate+NotificationHandling.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppDelegate+NotificationHandling.swift"; sourceTree = "<group>"; };
+		7246BC6BB74033CC9FFAC1FE /* MainViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		B0CAD10D4BC0B141AD746611 /* EventLog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EventLog.swift; sourceTree = "<group>"; };
+		B5E1DC98E222F64A432C792F /* AppDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		CAECC7FC47FCA2D183480926 /* AppDelegate+PushRegistration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppDelegate+PushRegistration.swift"; sourceTree = "<group>"; };
+		EE2A3D645103E31E8657377B /* NotificationType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotificationType.swift; sourceTree = "<group>"; };
+		EFE3D694FA4A35ACB1DDF8CE /* customSound.wav */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.wav; path = customSound.wav; sourceTree = "<group>"; };
+		FC57BD88413216BE2A44A23A /* PushNotificationData.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PushNotificationData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,8 +48,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				0F8B11642C5F838F00DE7FB5 /* FirebaseMessaging in Frameworks */,
-				0F8B11602C5F838F00DE7FB5 /* FirebaseAnalytics in Frameworks */,
-				0F8B11622C5F838F00DE7FB5 /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -55,7 +57,7 @@
 		0F8B113C2C5F82CE00DE7FB5 = {
 			isa = PBXGroup;
 			children = (
-				0F8B11472C5F82CE00DE7FB5 /* OnlineCubeCallDemo */,
+				0F8B11472C5F82CE00DE7FB5 /* PushWakeUpDemo */,
 				0F8B11462C5F82CE00DE7FB5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -63,108 +65,103 @@
 		0F8B11462C5F82CE00DE7FB5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0F8B11452C5F82CE00DE7FB5 /* OnlineCubeCallDemo.app */,
+				0F8B11452C5F82CE00DE7FB5 /* PushWakeUpDemo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		0F8B11472C5F82CE00DE7FB5 /* OnlineCubeCallDemo */ = {
+		0F8B11472C5F82CE00DE7FB5 /* PushWakeUpDemo */ = {
 			isa = PBXGroup;
 			children = (
-				0F8B11722C5FB2A700DE7FB5 /* App */,
-				0F8B11742C5FB2F000DE7FB5 /* Sources */,
+				A85FD267C94E87112E9ACC95 /* App */,
+				D6347CD329EC993A0DB4FD00 /* Push */,
+				D824CA3E2EA80253BFE0C8F1 /* EventLog */,
+				7E8ECC52E7AFEB382054C6B1 /* Screens */,
 				0F8B11732C5FB2E200DE7FB5 /* Resources */,
 			);
-			path = OnlineCubeCallDemo;
-			sourceTree = "<group>";
-		};
-		0F8B11722C5FB2A700DE7FB5 /* App */ = {
-			isa = PBXGroup;
-			children = (
-				0F8B11482C5F82CE00DE7FB5 /* AppDelegate.swift */,
-			);
-			path = App;
+			path = PushWakeUpDemo;
 			sourceTree = "<group>";
 		};
 		0F8B11732C5FB2E200DE7FB5 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				0F8B11852C60EAA000DE7FB5 /* OnlineCubeCallDemoDebug.entitlements */,
+				0FA95BF830682D4100F467EB /* GoogleService-Info.plist */,
+				0F8B11852C60EAA000DE7FB5 /* PushWakeUpDemo.entitlements */,
 				0F8B11512C5F82CF00DE7FB5 /* Assets.xcassets */,
 				0F8B11532C5F82CF00DE7FB5 /* LaunchScreen.storyboard */,
 				0F8B11562C5F82CF00DE7FB5 /* Info.plist */,
-				0F8B115C2C5F832E00DE7FB5 /* GoogleService-Info.plist */,
+				250496AFD54E413217BB39EB /* Sounds */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		0F8B11742C5FB2F000DE7FB5 /* Sources */ = {
+		250496AFD54E413217BB39EB /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
-				0F8B117C2C5FC66100DE7FB5 /* Loader */,
-				0F8B11762C5FB4DC00DE7FB5 /* Main */,
-				0F8B11752C5FB4D200DE7FB5 /* Services */,
-				0F8B11772C5FB4EA00DE7FB5 /* IncomingCall */,
+				EFE3D694FA4A35ACB1DDF8CE /* customSound.wav */,
 			);
-			path = Sources;
+			path = Sounds;
 			sourceTree = "<group>";
 		};
-		0F8B11752C5FB4D200DE7FB5 /* Services */ = {
+		37E8D25350F0F56DED1C408A /* CallPreview */ = {
 			isa = PBXGroup;
 			children = (
-				0F8B11842C60E67F00DE7FB5 /* SIP */,
-				0F8B11832C60E67100DE7FB5 /* Notification */,
+				4235722C60C9E1376633649E /* CallPreviewViewController.swift */,
 			);
-			path = Services;
+			path = CallPreview;
 			sourceTree = "<group>";
 		};
-		0F8B11762C5FB4DC00DE7FB5 /* Main */ = {
+		664866B08AFCD16A8C8E27A2 /* Main */ = {
 			isa = PBXGroup;
 			children = (
-				0F8B114C2C5F82CE00DE7FB5 /* MainViewController.swift */,
+				7246BC6BB74033CC9FFAC1FE /* MainViewController.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";
 		};
-		0F8B11772C5FB4EA00DE7FB5 /* IncomingCall */ = {
+		7E8ECC52E7AFEB382054C6B1 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
-				0F8B117A2C5FB59B00DE7FB5 /* IncomingCallViewController.swift */,
+				664866B08AFCD16A8C8E27A2 /* Main */,
+				37E8D25350F0F56DED1C408A /* CallPreview */,
 			);
-			path = IncomingCall;
+			path = Screens;
 			sourceTree = "<group>";
 		};
-		0F8B117C2C5FC66100DE7FB5 /* Loader */ = {
+		A85FD267C94E87112E9ACC95 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				0F8B117F2C5FC67900DE7FB5 /* LoaderView.swift */,
+				B5E1DC98E222F64A432C792F /* AppDelegate.swift */,
+				CAECC7FC47FCA2D183480926 /* AppDelegate+PushRegistration.swift */,
+				57AC77D4404EBA26DD494CC8 /* AppDelegate+NotificationHandling.swift */,
 			);
-			path = Loader;
+			path = App;
 			sourceTree = "<group>";
 		};
-		0F8B11832C60E67100DE7FB5 /* Notification */ = {
+		D6347CD329EC993A0DB4FD00 /* Push */ = {
 			isa = PBXGroup;
 			children = (
-				0F8B11812C60E63800DE7FB5 /* PushNotificationData.swift */,
-				0F8B11862C61036900DE7FB5 /* NotificationType.swift */,
+				FC57BD88413216BE2A44A23A /* PushNotificationData.swift */,
+				EE2A3D645103E31E8657377B /* NotificationType.swift */,
+				35D99F85BA05607DF6344C7F /* FCMTokenStore.swift */,
 			);
-			path = Notification;
+			path = Push;
 			sourceTree = "<group>";
 		};
-		0F8B11842C60E67F00DE7FB5 /* SIP */ = {
+		D824CA3E2EA80253BFE0C8F1 /* EventLog */ = {
 			isa = PBXGroup;
 			children = (
-				0F8B11782C5FB57D00DE7FB5 /* SIPService.swift */,
+				B0CAD10D4BC0B141AD746611 /* EventLog.swift */,
 			);
-			path = SIP;
+			path = EventLog;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		0F8B11442C5F82CE00DE7FB5 /* OnlineCubeCallDemo */ = {
+		0F8B11442C5F82CE00DE7FB5 /* PushWakeUpDemo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0F8B11592C5F82CF00DE7FB5 /* Build configuration list for PBXNativeTarget "OnlineCubeCallDemo" */;
+			buildConfigurationList = 0F8B11592C5F82CF00DE7FB5 /* Build configuration list for PBXNativeTarget "PushWakeUpDemo" */;
 			buildPhases = (
 				0F8B11412C5F82CE00DE7FB5 /* Sources */,
 				0F8B11422C5F82CE00DE7FB5 /* Frameworks */,
@@ -174,14 +171,12 @@
 			);
 			dependencies = (
 			);
-			name = OnlineCubeCallDemo;
+			name = PushWakeUpDemo;
 			packageProductDependencies = (
-				0F8B115F2C5F838F00DE7FB5 /* FirebaseAnalytics */,
-				0F8B11612C5F838F00DE7FB5 /* FirebaseAuth */,
 				0F8B11632C5F838F00DE7FB5 /* FirebaseMessaging */,
 			);
-			productName = OnlineCubeCallDemo;
-			productReference = 0F8B11452C5F82CE00DE7FB5 /* OnlineCubeCallDemo.app */;
+			productName = PushWakeUpDemo;
+			productReference = 0F8B11452C5F82CE00DE7FB5 /* PushWakeUpDemo.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -199,7 +194,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 0F8B11402C5F82CE00DE7FB5 /* Build configuration list for PBXProject "OnlineCubeCallDemo" */;
+			buildConfigurationList = 0F8B11402C5F82CE00DE7FB5 /* Build configuration list for PBXProject "PushWakeUpDemo" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -215,7 +210,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				0F8B11442C5F82CE00DE7FB5 /* OnlineCubeCallDemo */,
+				0F8B11442C5F82CE00DE7FB5 /* PushWakeUpDemo */,
 			);
 		};
 /* End PBXProject section */
@@ -226,8 +221,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				0F8B11522C5F82CF00DE7FB5 /* Assets.xcassets in Resources */,
-				0F8B115D2C5F832E00DE7FB5 /* GoogleService-Info.plist in Resources */,
+				0FA95BF930682D4100F467EB /* GoogleService-Info.plist in Resources */,
 				0F8B11552C5F82CF00DE7FB5 /* Base in Resources */,
+				FF23C9462109876E6A1FBB5D /* customSound.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -238,13 +234,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0F8B11872C61036900DE7FB5 /* NotificationType.swift in Sources */,
-				0F8B11792C5FB57D00DE7FB5 /* SIPService.swift in Sources */,
-				0F8B114D2C5F82CE00DE7FB5 /* MainViewController.swift in Sources */,
-				0F8B11822C60E63800DE7FB5 /* PushNotificationData.swift in Sources */,
-				0F8B11492C5F82CE00DE7FB5 /* AppDelegate.swift in Sources */,
-				0F8B117B2C5FB59B00DE7FB5 /* IncomingCallViewController.swift in Sources */,
-				0F8B11802C5FC67900DE7FB5 /* LoaderView.swift in Sources */,
+				47CBD78E16FFA8B405023256 /* AppDelegate.swift in Sources */,
+				0C689B7F5B68A9A0642574AB /* AppDelegate+PushRegistration.swift in Sources */,
+				1438D8B0D02E6A9712CA431B /* AppDelegate+NotificationHandling.swift in Sources */,
+				47746F7DDD5AB1DB490F8439 /* PushNotificationData.swift in Sources */,
+				CC04A60DE9FC66D0FCDAAF86 /* NotificationType.swift in Sources */,
+				CCFD609DF7927FAF486B2EC2 /* FCMTokenStore.swift in Sources */,
+				6C8544ECFA41589BDBA3648E /* EventLog.swift in Sources */,
+				FB3E23375C883AEB4D3BE876 /* MainViewController.swift in Sources */,
+				166A3194CFF1516B73F0C36F /* CallPreviewViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -386,13 +384,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = OnlineCubeCallDemo/Resources/OnlineCubeCallDemoDebug.entitlements;
+				CODE_SIGN_ENTITLEMENTS = PushWakeUpDemo/Resources/PushWakeUpDemo.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = H4V26893K7;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = OnlineCubeCallDemo/Resources/Info.plist;
+				INFOPLIST_FILE = PushWakeUpDemo/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PushWakeUp;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -404,10 +403,8 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.my.OnlineCubeCallDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.churiqlab.PushWakeUpDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -423,11 +420,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PushWakeUpDemo/Resources/PushWakeUpDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = H4V26893K7;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = OnlineCubeCallDemo/Resources/Info.plist;
+				INFOPLIST_FILE = PushWakeUpDemo/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PushWakeUp;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -439,8 +438,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.my.OnlineCubeCallDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.churiqlab.PushWakeUpDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -455,7 +453,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		0F8B11402C5F82CE00DE7FB5 /* Build configuration list for PBXProject "OnlineCubeCallDemo" */ = {
+		0F8B11402C5F82CE00DE7FB5 /* Build configuration list for PBXProject "PushWakeUpDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0F8B11572C5F82CF00DE7FB5 /* Debug */,
@@ -464,7 +462,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0F8B11592C5F82CF00DE7FB5 /* Build configuration list for PBXNativeTarget "OnlineCubeCallDemo" */ = {
+		0F8B11592C5F82CF00DE7FB5 /* Build configuration list for PBXNativeTarget "PushWakeUpDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0F8B115A2C5F82CF00DE7FB5 /* Debug */,
@@ -487,16 +485,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		0F8B115F2C5F838F00DE7FB5 /* FirebaseAnalytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 0F8B115E2C5F838F00DE7FB5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalytics;
-		};
-		0F8B11612C5F838F00DE7FB5 /* FirebaseAuth */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 0F8B115E2C5F838F00DE7FB5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAuth;
-		};
 		0F8B11632C5F838F00DE7FB5 /* FirebaseMessaging */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 0F8B115E2C5F838F00DE7FB5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
