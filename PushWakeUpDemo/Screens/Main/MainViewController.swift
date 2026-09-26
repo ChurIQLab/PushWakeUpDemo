@@ -70,7 +70,7 @@ final class MainViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch Section(rawValue: section)! {
-        case .token: return "FCM-токен (нажмите, чтобы скопировать)"
+        case .token: return "FCM-токен (нажмите: скопировать / AirDrop)"
         case .log: return "Журнал событий"
         }
     }
@@ -84,7 +84,7 @@ final class MainViewController: UITableViewController {
         case .token:
             content.text = FCMTokenStore.current ?? "Ещё не получен"
             content.textProperties.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
-            content.textProperties.numberOfLines = 3
+            content.textProperties.numberOfLines = 0
 
         case .log:
             cell.selectionStyle = .none
@@ -104,9 +104,11 @@ final class MainViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         guard Section(rawValue: indexPath.section) == .token, let token = FCMTokenStore.current else { return }
-        UIPasteboard.general.string = token
-        let alert = UIAlertController(title: "Скопировано", message: nil, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
+
+        // Токен нужен на Mac (консоль Firebase или Scripts/send_fcm_push.sh):
+        // в системном меню есть «Скопировать» и AirDrop.
+        let share = UIActivityViewController(activityItems: [token], applicationActivities: nil)
+        share.popoverPresentationController?.sourceView = tableView.cellForRow(at: indexPath)
+        present(share, animated: true)
     }
 }
