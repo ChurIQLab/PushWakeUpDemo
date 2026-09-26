@@ -1,0 +1,28 @@
+{
+    "message": {
+        "token": "FCM_TOKEN",
+        "data": {
+            "service_url": "https://example.com",
+            "panele_id": "panel-1",
+            "asterisk_url": "sip://asterisk.example.com",
+            "addr": "TEST",
+            "rtsp": "rtsp://example.com/stream",
+            "type": "sip_call",
+            "token": "demo-token",
+            "call_id": "call-123"
+        },
+        "apns": {
+            "payload": {
+                "aps": {
+                    "alert": {
+                        "title": "Ожидайте звонка",
+                        "body": "Домофон: TEST"
+                    },
+                    "sound": "customSound.wav",
+                    "category": "CALL_NOTIFICATION",
+                    "badge": 1
+                }
+            }
+        }
+    }
+}
