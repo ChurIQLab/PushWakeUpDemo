@@ -1,0 +1,23 @@
+# Firebase: у каждого свой проект. Файл скачивается из Firebase Console
+# и кладётся в PushWakeUpDemo/Resources/ (см. README).
+GoogleService-Info.plist
+
+# Ключи APNs (.p8) и сертификаты — никогда не коммитим
+*.p8
+*.p12
+*.cer
+*.mobileprovision
+
+# Xcode
+xcuserdata/
+DerivedData/
+build/
+*.xcscmblueprint
+*.xccheckout
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# macOS
+.DS_Store
