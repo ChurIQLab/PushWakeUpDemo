@@ -151,7 +151,11 @@ PushWakeUpDemo/
     ├── PushWakeUpDemo.entitlements              — aps-environment (Push Notifications)
     ├── Info.plist                               — фоновый режим remote-notification
     └── Sounds/customSound.wav
-Scripts/payloads/sip_call.apns                   — пуш для симулятора
+Scripts/
+├── send_fcm_push.sh                             — отправка пуша через FCM HTTP v1 (как сервер)
+├── payloads/fcm_call.json                       — боевой payload для скрипта
+├── payloads/sip_call.apns                       — тот же пуш для симулятора (simctl)
+└── secrets/service-account.json                 — ⚠️ не в git, ключ сервисного аккаунта
 ```
 
 **Журнал событий** на главном экране показывает каждое событие и состояние приложения
@@ -215,17 +219,73 @@ Firebase сам отправляет пуш в APNs, поэтому ему ну�
 
 Один `.p8` ключ работает для всех приложений команды и для обоих окружений (development и production).
 
-### Отправка
+### Запуск на iPhone и FCM-токен
 
 1. Запустить приложение на iPhone из Xcode, разрешить уведомления.
-2. В журнале: «APNs-токен получен» → «FCM-токен получен». Нажать на токен на главном экране — он скопируется.
-   Если «Ошибка регистрации в APNs» — проверьте подпись и *Push Notifications* в *Signing & Capabilities*.
-3. **Из консоли Firebase (быстро):** *Messaging* → *New campaign* → *Notifications* → заголовок и текст
-   → **Send test message** → вставить FCM-токен.
-   В *Additional options* → *Custom data* добавить `type` = `sip_call`, `addr` = `TEST`, `call_id` = `1`.
-   Консоль не умеет задавать `category` и свой звук — для этапа 1 это не важно.
-4. **Точно как сервер:** боевой payload целиком отправляется только через FCM HTTP v1 API
-   с OAuth-токеном сервисного аккаунта (*Project settings → Service accounts*).
+2. В журнале: «APNs-токен получен» → «FCM-токен получен». Сам токен виден:
+   - **в консоли Xcode** отдельной строкой `FCM_TOKEN=...` — удобнее всего, копируется сразу на Mac;
+   - **на главном экране** вверху — нажать → «Скопировать» или AirDrop на Mac;
+   - в записи журнала «FCM-токен получен».
+
+   Токен меняется после переустановки приложения — при ошибке `UNREGISTERED` возьмите новый.
+   Если в журнале «Ошибка регистрации в APNs» — проверьте подпись и *Push Notifications* в *Signing & Capabilities*.
+
+### Способ 1: консоль Firebase (быстро, без настройки)
+
+1. Firebase Console → *Messaging* → *New campaign* → *Notifications*.
+2. Заголовок и текст, например «Ожидайте звонка» / «Домофон: TEST».
+3. Справа **Send test message** → вставить FCM-токен в *Add an FCM registration token* → **+** → **Test**.
+
+Консоль не умеет задавать `category` и свой звук, а поля `data` в тестовое сообщение может не передать.
+Журнал это покажет: если по нажатию записано «Нажали на пуш, но это не звонок» — поля `type` и др. не пришли.
+Чтобы отправить **ровно боевой payload**, используйте скрипт.
+
+### Способ 2: скрипт `Scripts/send_fcm_push.sh` (боевой payload, как с сервера)
+
+Скрипт отправляет `Scripts/payloads/fcm_call.json` через FCM HTTP v1 API — тот же запрос, что делает сервер.
+Нужны только стандартные утилиты macOS: `curl`, `openssl`, `plutil`.
+
+**Настройка (один раз):**
+
+1. Firebase Console → ⚙️ *Project settings* → *Service accounts* → **Generate new private key** → скачается JSON.
+2. Сохранить его как `Scripts/secrets/service-account.json`.
+   Папка `Scripts/secrets/` в `.gitignore` — **ключ секретный, не коммитить и никому не отправлять**
+   (он даёт право слать пуши от имени проекта).
+
+   Хранить ключ можно и в другом месте — тогда указать путь:
+   `FIREBASE_SERVICE_ACCOUNT=/путь/к/ключу.json ./Scripts/send_fcm_push.sh ...`
+
+**Отправка:**
+
+```bash
+./Scripts/send_fcm_push.sh <FCM-токен>
+```
+
+Ответ `✅ Отправлено: projects/.../messages/...` значит, что Firebase принял пуш.
+
+- Свой payload: `./Scripts/send_fcm_push.sh <FCM-токен> путь/к/payload.json`
+  (формат как у `fcm_call.json`, в `message.token` скрипт сам подставит токен).
+- Посмотреть, что будет отправлено, без отправки: `DRY_RUN=1 ./Scripts/send_fcm_push.sh <FCM-токен>`
+
+**Как работает:** берёт из ключа `project_id`, `client_email`, `private_key` → подписывает JWT →
+меняет его у Google на OAuth-токен (`oauth2.googleapis.com/token`) →
+`POST https://fcm.googleapis.com/v1/projects/<project_id>/messages:send`.
+
+**Частые ошибки** (скрипт подсказывает сам):
+
+| Ответ | Причина |
+|---|---|
+| `UNREGISTERED` | Токен устарел: приложение переустановили. Возьмите новый. |
+| `SENDER_ID_MISMATCH` | Токен от другого Firebase-проекта: `GoogleService-Info.plist` и ключ из разных проектов. |
+| `THIRD_PARTY_AUTH_ERROR` | Firebase не смог отправить в APNs: не загружен `.p8` или неверный Key ID / Team ID. |
+| `invalid_grant` | Ключ сервисного аккаунта удалён или неверный — сгенерируйте новый. |
+
+### Что проверить на устройстве
+
+1. **Приложение открыто** → баннер, в журнале «Пуш пришёл при открытом приложении» с полями payload.
+2. **Свёрнуто** → пуш со звуком `customSound.wav` и бейджем, приложение ничего не пишет.
+3. **Убито** (смахнуть из многозадачности) → нажать на пуш → «Приложение запущено · холодный старт»
+   → «Нажали на пуш звонка» → «Экран предпросмотра показан».
 
 ## Частые вопросы
 
