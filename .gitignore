@@ -21,3 +21,7 @@ build/
 
 # macOS
 .DS_Store
+
+# Ключ сервисного аккаунта Firebase для Scripts/send_fcm_push.sh
+Scripts/secrets/
+*service-account*.json

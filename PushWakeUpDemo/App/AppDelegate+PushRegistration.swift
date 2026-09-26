@@ -28,7 +28,8 @@ extension AppDelegate: MessagingDelegate {
 
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         Messaging.messaging().apnsToken = deviceToken
-        EventLog.add("APNs-токен получен", details: "Дальше Firebase выдаст FCM-токен")
+        let token = deviceToken.map { String(format: "%02x", $0) }.joined()
+        EventLog.add("APNs-токен получен", details: "\(token)\nДальше Firebase выдаст FCM-токен")
     }
 
     /// Если здесь ошибка — FCM-токена не будет. Обычно причина в подписи
@@ -37,11 +38,16 @@ extension AppDelegate: MessagingDelegate {
         EventLog.add("Ошибка регистрации в APNs", details: error.localizedDescription)
     }
 
+    /// Firebase вызывает это при каждом запуске, а не только когда токен сменился.
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         DispatchQueue.main.async {
-            guard let fcmToken, fcmToken != FCMTokenStore.current else { return }
+            guard let fcmToken else { return }
+            let isNew = fcmToken != FCMTokenStore.current
             FCMTokenStore.current = fcmToken
-            EventLog.add("FCM-токен получен", details: "По нему сервер отправляет пуш")
+            EventLog.add(isNew ? "FCM-токен получен (новый)" : "FCM-токен получен (не изменился)", details: fcmToken)
+
+            // Отдельной строкой — чтобы при запуске из Xcode скопировать токен прямо из консоли.
+            print("FCM_TOKEN=\(fcmToken)")
         }
     }
 }
