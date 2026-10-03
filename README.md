@@ -144,7 +144,9 @@ PushWakeUpDemo/
 ├── EventLog/
 │   └── EventLog.swift                           — event log (survives relaunch)
 ├── Screens/
-│   ├── Main/MainViewController.swift            — FCM token + event log
+│   ├── Main/
+│   │   ├── MainViewController.swift             — FCM token + event log
+│   │   └── AppEvent+Style.swift                 — icons and colors for event kinds
 │   └── CallPreview/CallPreviewViewController.swift — screen opened by tapping the push
 └── Resources/
     ├── GoogleService-Info.plist                 — ⚠️ not in git, add your own
@@ -153,13 +155,15 @@ PushWakeUpDemo/
     └── Sounds/customSound.wav
 Scripts/
 ├── send_fcm_push.sh                             — send a push via FCM HTTP v1 (like the server)
+├── make_app_icon.swift                          — draws the app icon (swift Scripts/make_app_icon.swift)
 ├── payloads/fcm_call.json                       — production payload for the script
 ├── payloads/sip_call.apns                       — the same push for the simulator (simctl)
 └── secrets/service-account.json                 — ⚠️ not in git, service account key
 ```
 
-The **event log** on the main screen shows every event and the app state at that moment:
-`активно` (active), `неактивно` (inactive), `в фоне` (background), plus `холодный старт`
+The **event log** on the main screen is grouped by day ("Сегодня" / today, "Вчера" / yesterday, dates).
+Each event has a colored icon by kind (launch, push, tap, token, error), the time and the app state
+at that moment: `активно` (active), `неактивно` (inactive), `в фоне` (background), plus `холодный старт`
 (cold start) if the process has just been launched. This shows exactly what woke the app.
 
 ## Setup
