@@ -4,12 +4,27 @@ import UIKit
 /// Пока только показывает, что пришло в payload. Сам звонок — на следующих этапах.
 final class CallPreviewViewController: UITableViewController {
 
+    /// Как открыли экран — показываем в подписи, чтобы было видно разницу.
+    enum Origin {
+        case tap     // обычное нажатие на пуш
+        case answer  // кнопка «Ответить» в пуше
+
+        var subtitle: String {
+            switch self {
+            case .tap: return "Приложение открыто нажатием на пуш"
+            case .answer: return "Приложение открыто кнопкой «Ответить» в пуше"
+            }
+        }
+    }
+
     private let callData: PushNotificationData
+    private let origin: Origin
     private let rows: [(title: String, value: String)]
     private var didLogAppearance = false
 
-    init(callData: PushNotificationData) {
+    init(callData: PushNotificationData, origin: Origin) {
         self.callData = callData
+        self.origin = origin
         rows = [
             ("addr", callData.addr),
             ("call_id", callData.callID),
@@ -81,7 +96,7 @@ final class CallPreviewViewController: UITableViewController {
         titleLabel.numberOfLines = 0
 
         let subtitleLabel = UILabel()
-        subtitleLabel.text = "Приложение открыто по нажатию на пуш"
+        subtitleLabel.text = origin.subtitle
         subtitleLabel.font = .preferredFont(forTextStyle: .subheadline)
         subtitleLabel.textColor = .secondaryLabel
         subtitleLabel.textAlignment = .center

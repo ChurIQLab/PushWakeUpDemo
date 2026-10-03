@@ -9,7 +9,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     /// Звонок, по пушу которого нажали, но экран ещё нельзя показать (приложение не активно).
-    var pendingCallPreview: PushNotificationData?
+    var pendingCallPreview: (PushNotificationData, CallPreviewViewController.Origin)?
 
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
