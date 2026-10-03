@@ -8,6 +8,9 @@ extension AppEvent.Kind {
         case .launch: return "power"
         case .push: return "bell.badge.fill"
         case .tap: return "hand.tap.fill"
+        case .answer: return "phone.fill"
+        case .decline: return "phone.down.fill"
+        case .dismiss: return "hand.draw.fill"
         case .screen: return "rectangle.portrait.on.rectangle.portrait"
         case .token: return "key.fill"
         case .permission: return "checkmark.shield.fill"
@@ -22,6 +25,9 @@ extension AppEvent.Kind {
         case .launch: return .systemOrange
         case .push: return .systemBlue
         case .tap: return .systemGreen
+        case .answer: return .systemGreen
+        case .decline: return .systemRed
+        case .dismiss: return .systemGray
         case .screen: return .systemTeal
         case .token: return .systemPurple
         case .permission: return .systemGreen

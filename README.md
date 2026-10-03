@@ -27,7 +27,7 @@ Code comments are in Russian.
 | Stage | What it shows | Status |
 |---|---|---|
 | 1 | Regular push (Firebase): payload, banner while the app is open, tap → preview screen, cold start | ✅ |
-| 2 | Push action buttons (Answer / Decline) and handling a swipe-to-dismiss | ⏳ |
+| 2 | Push action buttons (Answer / Decline) and handling a swipe-to-dismiss | ✅ |
 | 3 | Modifying the push on the device: Notification Service Extension | ⏳ |
 | 4 | VoIP push: PushKit + CallKit — waking the app without user interaction | ⏳ |
 | 5 | Settings: VoIP on/off, notification permission status | ⏳ |
@@ -68,6 +68,36 @@ sequenceDiagram
 ```
 
 See `PushWakeUpDemo/App/AppDelegate+NotificationHandling.swift` for the commented code.
+
+## Push buttons and swipe-to-dismiss (stage 2)
+
+The server only sends the **category name** in the payload: `"category": "CALL_NOTIFICATION"`.
+The buttons themselves are not in the push — on launch the app tells iOS which buttons this
+category has (`PushWakeUpDemo/Push/CallNotificationCategory.swift`). From then on iOS shows them
+by itself, even if the app is killed.
+
+Buttons appear on a **long press** on the push; on the lock screen — swipe left → **View**.
+
+| Action | Option | What iOS does | Log entry |
+|---|---|---|---|
+| Tap the push | — | Opens the app | "Нажали на пуш звонка" → preview screen |
+| **Ответить** (Answer) | `.foreground` | Opens the app (asks to unlock the phone) | "Нажали «Ответить» в пуше" → preview screen |
+| **Отклонить** (Decline) | no `.foreground`, `.destructive` (red) | Wakes the app **in background**, no screen, the phone stays locked | "Нажали «Отклонить» в пуше" · `в фоне` |
+| **Dismissed** (swipe left → Clear) | `.customDismissAction` on the category | Wakes the app **in background** | "Пуш смахнули" · `в фоне` |
+
+All actions arrive in the same `didReceive` method and differ by `response.actionIdentifier`:
+`UNNotificationDefaultActionIdentifier` (tap), `CALL_ANSWER`, `CALL_DECLINE`,
+`UNNotificationDismissActionIdentifier` (dismissed).
+
+If the app was killed, the log shows "Приложение запущено · холодный старт" before the action:
+`неактивно` (inactive) for tap and Answer, `в фоне` (background) for Decline and dismiss.
+
+In background the app has a few seconds: a real app tells the server the call was declined
+here, and only then calls `completionHandler`.
+
+Without `.customDismissAction` a dismiss is silent — the app never learns about it.
+Flicking a banner up while it's at the top of the screen is not a dismiss: the push stays in
+Notification Center and no event arrives.
 
 ## Payload
 
@@ -140,6 +170,7 @@ PushWakeUpDemo/
 ├── Push/
 │   ├── PushNotificationData.swift               — payload model
 │   ├── NotificationType.swift                   — the "type" field
+│   ├── CallNotificationCategory.swift           — call push buttons
 │   └── FCMTokenStore.swift                      — latest FCM token
 ├── EventLog/
 │   └── EventLog.swift                           — event log (survives relaunch)
@@ -207,6 +238,11 @@ Or just drag `Scripts/payloads/sip_call.apns` onto the simulator window.
    Send the push → tap **the push** (banner or Notification Center — drag down from the top edge).
    Log: "Приложение запущено · холодный старт" → "Нажали на пуш звонка" → "Экран предпросмотра показан".
 4. **Badge.** Send the app to background, send the push → "1" on the icon. Open the app → the badge is gone.
+5. **Buttons.** Kill the app, send the push, long-press it with the mouse, or on the lock screen (⌘L) swipe left → View.
+   Tap **Отклонить** (Decline) → the phone stays locked, the log shows "Приложение запущено · в фоне" →
+   "Нажали «Отклонить» в пуше". **Ответить** (Answer) → the app opens with the preview.
+6. **Dismiss.** Kill the app, send the push, in Notification Center or on the lock screen swipe left → **Clear**.
+   Log: "Приложение запущено · в фоне" → "Пуш смахнули".
 
 ## Testing on an iPhone via Firebase
 
@@ -241,6 +277,7 @@ One `.p8` key works for all apps of the team and both environments (development 
 3. On the right, **Send test message** → paste the FCM token into *Add an FCM registration token* → **+** → **Test**.
 
 The console can't set `category` or a custom sound, and may not pass the `data` fields into a test message.
+**Without `category` the push has no Answer / Decline buttons** — use the script for them.
 The log shows it: if tapping the push logs "Нажали на пуш, но это не звонок", `type` and the other fields didn't arrive.
 To send **exactly the production payload**, use the script.
 

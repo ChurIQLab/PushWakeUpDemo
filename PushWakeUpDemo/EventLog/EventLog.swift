@@ -7,6 +7,9 @@ struct AppEvent: Codable {
         case launch      // процесс приложения запущен
         case push        // пуш пришёл, пока приложение открыто
         case tap         // пользователь нажал на пуш
+        case answer      // нажали кнопку «Ответить» в пуше
+        case decline     // нажали кнопку «Отклонить» в пуше
+        case dismiss     // пуш смахнули
         case screen      // показан экран
         case token       // получен APNs- или FCM-токен
         case permission  // ответ на запрос разрешения

@@ -13,6 +13,7 @@ extension AppDelegate: MessagingDelegate {
         FirebaseApp.configure()
         Messaging.messaging().delegate = self
         UNUserNotificationCenter.current().delegate = self
+        CallNotificationCategory.register()
 
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
             DispatchQueue.main.async {
