@@ -1,12 +1,15 @@
 import UIKit
 
-/// Экран предпросмотра звонка: сюда попадаем по тапу на пуш.
+/// Экран предпросмотра звонка: сюда попадаем по нажатию на пуш.
 /// Пока только показывает, что пришло в payload. Сам звонок — на следующих этапах.
 final class CallPreviewViewController: UITableViewController {
 
+    private let callData: PushNotificationData
     private let rows: [(title: String, value: String)]
+    private var didLogAppearance = false
 
     init(callData: PushNotificationData) {
+        self.callData = callData
         rows = [
             ("addr", callData.addr),
             ("call_id", callData.callID),
@@ -18,7 +21,7 @@ final class CallPreviewViewController: UITableViewController {
             ("token", callData.token)
         ]
         super.init(style: .insetGrouped)
-        title = callData.addr.isEmpty ? "Домофон" : "Домофон: \(callData.addr)"
+        title = "Звонок"
     }
 
     required init?(coder: NSCoder) {
@@ -30,12 +33,79 @@ final class CallPreviewViewController: UITableViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(systemItem: .close, primaryAction: UIAction { [weak self] _ in
             self?.dismiss(animated: true)
         })
+        tableView.tableHeaderView = makeHeader()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        // Высота шапки таблицы не считается сама — подгоняем под содержимое.
+        guard let header = tableView.tableHeaderView else { return }
+        let height = header.systemLayoutSizeFitting(CGSize(width: tableView.bounds.width, height: 0),
+                                                    withHorizontalFittingPriority: .required,
+                                                    verticalFittingPriority: .fittingSizeLevel).height
+        if header.frame.height != height {
+            header.frame.size.height = height
+            tableView.tableHeaderView = header
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        EventLog.add("Экран предпросмотра показан", details: title)
+        // viewDidAppear приходит снова, если экран начали смахивать и отпустили.
+        guard !didLogAppearance else { return }
+        didLogAppearance = true
+        EventLog.add(.screen, "Экран предпросмотра показан", details: "Домофон: \(callData.addr)")
     }
+
+    // MARK: - Header
+
+    /// Иконка, адрес домофона и подпись — чтобы сразу было видно, какой это звонок.
+    private func makeHeader() -> UIView {
+        let icon = UIImageView(image: UIImage(systemName: "bell.fill",
+                                              withConfiguration: UIImage.SymbolConfiguration(pointSize: 34, weight: .semibold)))
+        icon.tintColor = .white
+        icon.contentMode = .center
+        icon.backgroundColor = UIColor(named: "AccentColor") ?? .systemIndigo
+        icon.layer.cornerRadius = 40
+        icon.clipsToBounds = true
+        icon.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            icon.widthAnchor.constraint(equalToConstant: 80),
+            icon.heightAnchor.constraint(equalToConstant: 80)
+        ])
+
+        let titleLabel = UILabel()
+        titleLabel.text = callData.addr.isEmpty ? "Домофон" : "Домофон: \(callData.addr)"
+        titleLabel.font = .preferredFont(forTextStyle: .title2).withWeight(.bold)
+        titleLabel.textAlignment = .center
+        titleLabel.numberOfLines = 0
+
+        let subtitleLabel = UILabel()
+        subtitleLabel.text = "Приложение открыто по нажатию на пуш"
+        subtitleLabel.font = .preferredFont(forTextStyle: .subheadline)
+        subtitleLabel.textColor = .secondaryLabel
+        subtitleLabel.textAlignment = .center
+        subtitleLabel.numberOfLines = 0
+
+        let stack = UIStackView(arrangedSubviews: [icon, titleLabel, subtitleLabel])
+        stack.axis = .vertical
+        stack.alignment = .center
+        stack.spacing = 8
+        stack.setCustomSpacing(16, after: icon)
+        stack.translatesAutoresizingMaskIntoConstraints = false
+
+        let header = UIView()
+        header.addSubview(stack)
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: header.topAnchor, constant: 24),
+            stack.bottomAnchor.constraint(equalTo: header.bottomAnchor, constant: -8),
+            stack.leadingAnchor.constraint(equalTo: header.layoutMarginsGuide.leadingAnchor),
+            stack.trailingAnchor.constraint(equalTo: header.layoutMarginsGuide.trailingAnchor)
+        ])
+        return header
+    }
+
+    // MARK: - Table
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         rows.count
@@ -49,9 +119,18 @@ final class CallPreviewViewController: UITableViewController {
         let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
         var content = UIListContentConfiguration.valueCell()
         content.text = rows[indexPath.row].title
+        content.textProperties.font = .monospacedSystemFont(ofSize: 15, weight: .regular)
         content.secondaryText = rows[indexPath.row].value.isEmpty ? "—" : rows[indexPath.row].value
+        content.prefersSideBySideTextAndSecondaryText = true
         cell.contentConfiguration = content
         cell.selectionStyle = .none
         return cell
+    }
+}
+
+private extension UIFont {
+    func withWeight(_ weight: UIFont.Weight) -> UIFont {
+        let descriptor = fontDescriptor.addingAttributes([.traits: [UIFontDescriptor.TraitKey.weight: weight]])
+        return UIFont(descriptor: descriptor, size: 0)
     }
 }
