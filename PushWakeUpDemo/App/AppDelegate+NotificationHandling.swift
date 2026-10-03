@@ -17,8 +17,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         let userInfo = notification.request.content.userInfo
         DispatchQueue.main.async {
-            EventLog.add("Пуш пришёл при открытом приложении",
-                         details: "Показываем баннер. Payload: \(Self.describe(userInfo))")
+            EventLog.add(.push, "Пуш пришёл при открытом приложении",
+                         details: "Показываем баннер\n\(Self.describe(userInfo))")
             completionHandler([.banner, .list, .badge, .sound])
         }
     }
@@ -32,15 +32,15 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             defer { completionHandler() }
 
             guard NotificationType(userInfo: userInfo) == .sipCall else {
-                EventLog.add("Нажали на пуш, но это не звонок", details: "Payload: \(Self.describe(userInfo))")
+                EventLog.add(.warning, "Нажали на пуш, но это не звонок", details: Self.describe(userInfo))
                 return
             }
             guard let callData = PushNotificationData(userInfo: userInfo) else {
-                EventLog.add("Не удалось разобрать payload", details: Self.describe(userInfo))
+                EventLog.add(.error, "Не удалось разобрать payload", details: Self.describe(userInfo))
                 return
             }
 
-            EventLog.add("Нажали на пуш звонка", details: "Открываем предпросмотр. Домофон: \(callData.addr)")
+            EventLog.add(.tap, "Нажали на пуш звонка", details: "Открываем предпросмотр. Домофон: \(callData.addr)")
             self.showCallPreview(with: callData)
         }
     }
@@ -69,12 +69,18 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         topViewController?.present(preview, animated: true)
     }
 
-    /// Payload одной строкой для журнала (без `aps`).
+    /// Поля payload для журнала — по одному на строку. Без `aps` (это текст пуша для iOS)
+    /// и служебных ключей Firebase и simctl.
     private static func describe(_ userInfo: [AnyHashable: Any]) -> String {
-        userInfo
-            .filter { $0.key as? String != "aps" }
-            .map { "\($0.key)=\($0.value)" }
+        let serviceKeys = ["aps", "Simulator Target Bundle", "fcm_options"]
+        return userInfo
+            .compactMap { key, value -> String? in
+                guard let key = key as? String,
+                      !serviceKeys.contains(key),
+                      !key.hasPrefix("gcm."), !key.hasPrefix("google.") else { return nil }
+                return "\(key): \(value)"
+            }
             .sorted()
-            .joined(separator: ", ")
+            .joined(separator: "\n")
     }
 }

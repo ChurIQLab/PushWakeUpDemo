@@ -12,6 +12,7 @@
 		0F8B11552C5F82CF00DE7FB5 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 0F8B11542C5F82CF00DE7FB5 /* Base */; };
 		0F8B11642C5F838F00DE7FB5 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 0F8B11632C5F838F00DE7FB5 /* FirebaseMessaging */; };
 		0FA95BF930682D4100F467EB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0FA95BF830682D4100F467EB /* GoogleService-Info.plist */; };
+		1038B8CEA4C0BB3444C96FA5 /* AppEvent+Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7142BF88BD2451475C147710 /* AppEvent+Style.swift */; };
 		1438D8B0D02E6A9712CA431B /* AppDelegate+NotificationHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57AC77D4404EBA26DD494CC8 /* AppDelegate+NotificationHandling.swift */; };
 		166A3194CFF1516B73F0C36F /* CallPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4235722C60C9E1376633649E /* CallPreviewViewController.swift */; };
 		47746F7DDD5AB1DB490F8439 /* PushNotificationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC57BD88413216BE2A44A23A /* PushNotificationData.swift */; };
@@ -33,6 +34,7 @@
 		35D99F85BA05607DF6344C7F /* FCMTokenStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FCMTokenStore.swift; sourceTree = "<group>"; };
 		4235722C60C9E1376633649E /* CallPreviewViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CallPreviewViewController.swift; sourceTree = "<group>"; };
 		57AC77D4404EBA26DD494CC8 /* AppDelegate+NotificationHandling.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppDelegate+NotificationHandling.swift"; sourceTree = "<group>"; };
+		7142BF88BD2451475C147710 /* AppEvent+Style.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppEvent+Style.swift"; sourceTree = "<group>"; };
 		7246BC6BB74033CC9FFAC1FE /* MainViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		B0CAD10D4BC0B141AD746611 /* EventLog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EventLog.swift; sourceTree = "<group>"; };
 		B5E1DC98E222F64A432C792F /* AppDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 			isa = PBXGroup;
 			children = (
 				7246BC6BB74033CC9FFAC1FE /* MainViewController.swift */,
+				7142BF88BD2451475C147710 /* AppEvent+Style.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -243,6 +246,7 @@
 				6C8544ECFA41589BDBA3648E /* EventLog.swift in Sources */,
 				FB3E23375C883AEB4D3BE876 /* MainViewController.swift in Sources */,
 				166A3194CFF1516B73F0C36F /* CallPreviewViewController.swift in Sources */,
+				1038B8CEA4C0BB3444C96FA5 /* AppEvent+Style.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
