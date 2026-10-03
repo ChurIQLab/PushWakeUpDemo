@@ -18,6 +18,7 @@
 		47746F7DDD5AB1DB490F8439 /* PushNotificationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC57BD88413216BE2A44A23A /* PushNotificationData.swift */; };
 		47CBD78E16FFA8B405023256 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E1DC98E222F64A432C792F /* AppDelegate.swift */; };
 		6C8544ECFA41589BDBA3648E /* EventLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0CAD10D4BC0B141AD746611 /* EventLog.swift */; };
+		B3E87719FB0713C781E8D576 /* CallNotificationCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD7C4F3AC15EC1EC1E4325 /* CallNotificationCategory.swift */; };
 		CC04A60DE9FC66D0FCDAAF86 /* NotificationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2A3D645103E31E8657377B /* NotificationType.swift */; };
 		CCFD609DF7927FAF486B2EC2 /* FCMTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D99F85BA05607DF6344C7F /* FCMTokenStore.swift */; };
 		FB3E23375C883AEB4D3BE876 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7246BC6BB74033CC9FFAC1FE /* MainViewController.swift */; };
@@ -36,6 +37,7 @@
 		57AC77D4404EBA26DD494CC8 /* AppDelegate+NotificationHandling.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppDelegate+NotificationHandling.swift"; sourceTree = "<group>"; };
 		7142BF88BD2451475C147710 /* AppEvent+Style.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppEvent+Style.swift"; sourceTree = "<group>"; };
 		7246BC6BB74033CC9FFAC1FE /* MainViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		7BBD7C4F3AC15EC1EC1E4325 /* CallNotificationCategory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CallNotificationCategory.swift; sourceTree = "<group>"; };
 		B0CAD10D4BC0B141AD746611 /* EventLog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EventLog.swift; sourceTree = "<group>"; };
 		B5E1DC98E222F64A432C792F /* AppDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CAECC7FC47FCA2D183480926 /* AppDelegate+PushRegistration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppDelegate+PushRegistration.swift"; sourceTree = "<group>"; };
@@ -147,6 +149,7 @@
 				FC57BD88413216BE2A44A23A /* PushNotificationData.swift */,
 				EE2A3D645103E31E8657377B /* NotificationType.swift */,
 				35D99F85BA05607DF6344C7F /* FCMTokenStore.swift */,
+				7BBD7C4F3AC15EC1EC1E4325 /* CallNotificationCategory.swift */,
 			);
 			path = Push;
 			sourceTree = "<group>";
@@ -247,6 +250,7 @@
 				FB3E23375C883AEB4D3BE876 /* MainViewController.swift in Sources */,
 				166A3194CFF1516B73F0C36F /* CallPreviewViewController.swift in Sources */,
 				1038B8CEA4C0BB3444C96FA5 /* AppEvent+Style.swift in Sources */,
+				B3E87719FB0713C781E8D576 /* CallNotificationCategory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
