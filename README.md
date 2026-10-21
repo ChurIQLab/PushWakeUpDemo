@@ -28,7 +28,7 @@ Code comments are in Russian.
 |---|---|---|
 | 1 | Regular push (Firebase): payload, banner while the app is open, tap → preview screen, cold start | ✅ |
 | 2 | Push action buttons (Answer / Decline) and handling a swipe-to-dismiss | ✅ |
-| 3 | Modifying the push on the device: Notification Service Extension | ⏳ |
+| 3 | Modifying the push on the device: Notification Service Extension | ✅ code · iPhone test pending |
 | 4 | VoIP push: PushKit + CallKit — waking the app without user interaction | ⏳ |
 | 5 | Settings: VoIP on/off, notification permission status | ⏳ |
 
@@ -98,6 +98,46 @@ here, and only then calls `completionHandler`.
 Without `.customDismissAction` a dismiss is silent — the app never learns about it.
 Flicking a banner up while it's at the top of the screen is not a dismiss: the push stays in
 Notification Center and no event arrives.
+
+## Modifying the push on the device (stage 3)
+
+A **Notification Service Extension (NSE)** is a small separate process inside the app
+(`NotificationService/`). iOS runs it for every push **before showing it** and gives it about
+30 seconds to change the content.
+
+- It works even if the app is killed. **The app itself is not woken up.**
+- It runs only if `aps` contains **`"mutable-content": 1`**. Without it iOS shows the push as is.
+  The production payload doesn't have it — for stage 3 the server must add exactly this field
+  (example: `Scripts/payloads/fcm_call_nse.json`, one line different from `fcm_call.json`).
+- If the extension runs out of time, iOS calls `serviceExtensionTimeWillExpire` and shows whatever was changed so far.
+
+What the extension does with a call push (`type = sip_call`):
+
+| Before (from the server) | After |
+|---|---|
+| "Ожидайте звонка" / "Домофон: TEST" | "📞 Входящий звонок", subtitle "Домофон: TEST", a hint about the buttons |
+| `category` may be missing | `CALL_NOTIFICATION` — Answer / Decline buttons always appear, even for a Firebase console push |
+| regular push | **time-sensitive** — breaks through Do Not Disturb and Focus |
+| — | sound `customSound.wav`, grouped by `call_id` |
+| — | `nse_modified: 1` added to `userInfo` — visible in the app log |
+
+The extension writes "Расширение изменило пуш" (pink icon) to the log with before / after text.
+To write to the same log, the log lives in the shared **App Group** container
+`group.com.churiqlab.PushWakeUpDemo` (before stage 3 it was in the app's UserDefaults and is migrated automatically).
+
+Code: `NotificationService/NotificationService.swift`. The extension also compiles shared app files:
+`EventLog.swift`, `PushNotificationData.swift`, `NotificationType.swift`, `CallNotificationCategory.swift`.
+
+**Testing — on an iPhone only.** `xcrun simctl push` does not run the extension (checked on iOS 26.5).
+
+```bash
+./Scripts/send_fcm_push.sh <FCM-token> Scripts/payloads/fcm_call_nse.json
+```
+
+1. App killed → the push arrives already as "📞 Входящий звонок" with the Time Sensitive label.
+2. Open the app: the first entry is "Расширение изменило пуш" with the state
+   "расширение · отдельный процесс, приложение не будится". There is no "Приложение запущено" before it.
+3. For comparison send `fcm_call.json` (no `mutable-content`) — the push arrives unchanged, no extension entry.
 
 ## Payload
 
@@ -173,7 +213,8 @@ PushWakeUpDemo/
 │   ├── CallNotificationCategory.swift           — call push buttons
 │   └── FCMTokenStore.swift                      — latest FCM token
 ├── EventLog/
-│   └── EventLog.swift                           — event log (survives relaunch)
+│   ├── EventLog.swift                           — event log (shared with the extension, App Group)
+│   └── EventLog+AppState.swift                  — app state for the log
 ├── Screens/
 │   ├── Main/
 │   │   ├── MainViewController.swift             — FCM token + event log
@@ -181,13 +222,18 @@ PushWakeUpDemo/
 │   └── CallPreview/CallPreviewViewController.swift — screen opened by tapping the push
 └── Resources/
     ├── GoogleService-Info.plist                 — ⚠️ not in git, add your own
-    ├── PushWakeUpDemo.entitlements              — aps-environment (Push Notifications)
+    ├── PushWakeUpDemo.entitlements              — push, time sensitive, App Group
     ├── Info.plist                               — remote-notification background mode
     └── Sounds/customSound.wav
+NotificationService/
+├── NotificationService.swift                    — Notification Service Extension (stage 3)
+├── Info.plist
+└── NotificationService.entitlements             — App Group
 Scripts/
 ├── send_fcm_push.sh                             — send a push via FCM HTTP v1 (like the server)
 ├── make_app_icon.swift                          — draws the app icon (swift Scripts/make_app_icon.swift)
 ├── payloads/fcm_call.json                       — production payload for the script
+├── payloads/fcm_call_nse.json                   — same + "mutable-content": 1 (stage 3)
 ├── payloads/sip_call.apns                       — the same push for the simulator (simctl)
 └── secrets/service-account.json                 — ⚠️ not in git, service account key
 ```
@@ -215,8 +261,15 @@ Without it the build fails with
 
 ### 2. Signing
 
-Xcode → *PushWakeUpDemo* target → *Signing & Capabilities* → select your *Team*.
-*Push Notifications* are already enabled (`aps-environment` in the entitlements).
+Xcode → *Signing & Capabilities* → select your *Team* for **both** targets:
+*PushWakeUpDemo* and *NotificationService*.
+
+The capabilities are already in the entitlements; Xcode with automatic signing registers them itself:
+- *Push Notifications* (`aps-environment`);
+- *Time Sensitive Notifications* — for time-sensitive pushes;
+- *App Groups* `group.com.churiqlab.PushWakeUpDemo` — shared log for the app and the extension.
+
+If you change the bundle ID, also change the App Group in both `.entitlements` files and in `EventLog.appGroup`.
 
 ## Testing on the simulator without a server
 
