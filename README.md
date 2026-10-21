@@ -29,7 +29,7 @@ Code comments are in Russian.
 | 1 | Regular push (Firebase): payload, banner while the app is open, tap → preview screen, cold start | ✅ |
 | 2 | Push action buttons (Answer / Decline) and handling a swipe-to-dismiss | ✅ |
 | 3 | Modifying the push on the device: Notification Service Extension | ✅ |
-| 4 | VoIP push: PushKit + CallKit — waking the app without user interaction | ⏳ |
+| 4 | VoIP push: PushKit + CallKit — waking the app without user interaction | ✅ code · iPhone test pending |
 | 5 | Settings: VoIP on/off, notification permission status | ⏳ |
 
 ## How regular pushes work
@@ -139,6 +139,79 @@ Code: `NotificationService/NotificationService.swift`. The extension also compil
    "расширение · отдельный процесс, приложение не будится". There is no "Приложение запущено" before it.
 3. For comparison send `fcm_call.json` (no `mutable-content`) — the push arrives unchanged, no extension entry.
 
+## VoIP push: PushKit + CallKit (stage 4)
+
+The only way to wake the app **without any user action**.
+
+| | Regular push (stages 1–3) | VoIP push (PushKit) |
+|---|---|---|
+| App killed | iOS shows the push, the app stays asleep | **iOS launches the app right away** |
+| Notifications denied | Push is not shown | **Still works** |
+| What the user sees | Banner / lock screen | **Native CallKit call screen**, like a phone call |
+| Who sends it | Firebase (FCM) | **APNs directly** — Firebase doesn't send VoIP pushes |
+| Token | FCM token | **VoIP token** — a separate one, issued by PushKit |
+| iOS requirement | — | Report a CallKit call for **every** VoIP push right away |
+
+**The main iOS rule:** on a VoIP push the app must call `CXProvider.reportNewIncomingCall`
+right away — before PushKit's `completion`. Otherwise iOS kills the app, and after a few violations
+stops delivering VoIP pushes to it. So the CallKit call is always reported, even for an odd payload.
+
+The flow in code:
+
+1. `didFinishLaunching` → `VoIPPushService.start()` — the PushKit registry is created **on every launch**:
+   if a VoIP push launched the app, iOS delivers it only after that.
+2. PushKit issues the **VoIP token** → main screen, log, Xcode console (`VOIP_TOKEN=…`).
+3. VoIP push → "VoIP-пуш разбудил приложение" → `CallKitService.reportIncomingCall` →
+   "Показан экран звонка CallKit".
+4. **Answer** → "Ответили в CallKit" → preview screen ("Ответили на экране звонка CallKit").
+   It's a video call (`hasVideo`), so iOS opens the app right away. Closing the preview ends the
+   CallKit call ("Звонок завершён").
+5. **Decline** → "Звонок отклонён в CallKit" — a real app tells the server here.
+6. No answer within 30 seconds → "Звонок пропущен" (missed).
+
+Code: `PushWakeUpDemo/VoIP/VoIPPushService.swift` (PushKit), `PushWakeUpDemo/VoIP/CallKitService.swift` (CallKit),
+wiring — `PushWakeUpDemo/App/AppDelegate+VoIP.swift`. `Info.plist` has the `voip` background mode.
+
+### Sending a VoIP push: `Scripts/send_voip_push.sh`
+
+The server sends VoIP pushes to APNs itself, and the script does exactly that: a JWT signed with the
+`.p8` key (ES256), `apns-topic: com.churiqlab.PushWakeUpDemo.voip`, `apns-push-type: voip`.
+It only needs standard macOS tools: `curl`, `openssl`, `xxd`.
+
+**Setup (once):** put the APNs key — **the same `.p8` uploaded to Firebase** — into
+`Scripts/secrets/AuthKey_<KEY_ID>.p8`. Keep Apple's file name: the script takes the Key ID from it.
+The Team ID is read from the project. `Scripts/secrets/` and all `.p8` files are in `.gitignore`.
+
+```bash
+./Scripts/send_voip_push.sh <VoIP-token>
+```
+
+- Payload: `Scripts/payloads/voip_call.json` — the same call fields at the root, empty `aps` (a VoIP push
+  shows nothing by itself, CallKit draws the screen). Pass your own payload as the second argument.
+- Environment: Xcode build — `sandbox` (default), TestFlight / App Store — `APNS_ENV=production`.
+- Other key location or name: `APNS_KEY_FILE=…`, `APNS_KEY_ID=…`, `APNS_TEAM_ID=…`, `APNS_BUNDLE_ID=…`.
+- `DRY_RUN=1` — show what would be sent.
+
+| APNs response | Cause |
+|---|---|
+| `BadDeviceToken` | Not a VoIP token, or the wrong environment (sandbox / production) |
+| `DeviceTokenNotForTopic` | Token from another app — e.g. an FCM token was pasted |
+| `InvalidProviderToken` | Wrong Key ID / Team ID, or APNs is not enabled for the key |
+| `Unregistered` | The app was deleted or reinstalled — take a new token |
+
+### Testing — on an iPhone only
+
+The simulator doesn't issue a VoIP token, and the CallKit screen is dropped right away there.
+
+1. Run the app on an iPhone from Xcode → the log shows "VoIP-токен получен", the token is on the main
+   screen and in the Xcode console (`VOIP_TOKEN=…`).
+2. **Swipe the app away** in the app switcher. You can even deny notifications in Settings.
+3. `./Scripts/send_voip_push.sh <VoIP-token>` → the iPhone **immediately shows the CallKit call** — "Домофон: TEST".
+4. Answer → the app opens with the preview. Log:
+   "Приложение запущено · в фоне · холодный старт" → "VoIP-пуш разбудил приложение" →
+   "Показан экран звонка CallKit" → "Ответили в CallKit" → "Экран предпросмотра показан".
+5. Again, but Decline → "Звонок отклонён в CallKit". Once more — don't answer for 30 s → "Звонок пропущен".
+
 ## Payload
 
 This is how the server sends the push via **FCM HTTP v1** (`POST https://fcm.googleapis.com/v1/projects/<project-id>/messages:send`):
@@ -206,12 +279,16 @@ PushWakeUpDemo/
 ├── App/
 │   ├── AppDelegate.swift                        — launch, window, badge reset
 │   ├── AppDelegate+PushRegistration.swift       — permission, APNs token → FCM token
-│   └── AppDelegate+NotificationHandling.swift   — push arrived / push tapped
+│   ├── AppDelegate+NotificationHandling.swift   — push arrived / push tapped
+│   └── AppDelegate+VoIP.swift                   — VoIP push → CallKit → preview
 ├── Push/
 │   ├── PushNotificationData.swift               — payload model
 │   ├── NotificationType.swift                   — the "type" field
 │   ├── CallNotificationCategory.swift           — call push buttons
-│   └── FCMTokenStore.swift                      — latest FCM token
+│   └── TokenStore.swift                         — FCM and VoIP tokens
+├── VoIP/
+│   ├── VoIPPushService.swift                    — PushKit: VoIP token and VoIP pushes
+│   └── CallKitService.swift                     — CallKit: call screen, answer, decline
 ├── EventLog/
 │   ├── EventLog.swift                           — event log (shared with the extension, App Group)
 │   └── EventLog+AppState.swift                  — app state for the log
@@ -231,11 +308,13 @@ NotificationService/
 └── NotificationService.entitlements             — App Group
 Scripts/
 ├── send_fcm_push.sh                             — send a push via FCM HTTP v1 (like the server)
+├── send_voip_push.sh                            — VoIP push straight to APNs (.p8 key)
 ├── make_app_icon.swift                          — draws the app icon (swift Scripts/make_app_icon.swift)
 ├── payloads/fcm_call.json                       — production payload for the script
 ├── payloads/fcm_call_nse.json                   — same + "mutable-content": 1 (stage 3)
+├── payloads/voip_call.json                      — VoIP push for send_voip_push.sh
 ├── payloads/sip_call.apns                       — the same push for the simulator (simctl)
-└── secrets/service-account.json                 — ⚠️ not in git, service account key
+└── secrets/                                     — ⚠️ not in git: service-account.json, AuthKey_<KEY_ID>.p8
 ```
 
 The **event log** on the main screen is grouped by day ("Сегодня" / today, "Вчера" / yesterday, dates).
