@@ -28,7 +28,7 @@
 |---|---|---|
 | 1 | Обычный пуш (Firebase): payload, баннер при открытом приложении, нажатие → экран предпросмотра, холодный старт | ✅ |
 | 2 | Кнопки в пуше («Ответить» / «Отклонить») и реакция на смахивание | ✅ |
-| 3 | Изменение пуша на устройстве: Notification Service Extension | ⏳ |
+| 3 | Изменение пуша на устройстве: Notification Service Extension | ✅ |
 | 4 | VoIP-пуш: PushKit + CallKit — пробуждение приложения без участия пользователя | ⏳ |
 | 5 | Настройки: вкл/выкл VoIP, статус разрешения на уведомления | ⏳ |
 
@@ -98,6 +98,46 @@ sequenceDiagram
 Без опции `.customDismissAction` смахивание проходит молча — приложение о нём не узнает.
 Сворачивание баннера вверх (пока он висит сверху экрана) — это не смахивание: пуш остаётся
 в центре уведомлений, и событие не приходит.
+
+## Изменение пуша на устройстве (этап 3)
+
+**Notification Service Extension (NSE)** — отдельный маленький процесс внутри приложения
+(`NotificationService/`). iOS запускает его на каждый пуш **до того, как показать пуш**,
+и даёт около 30 секунд поменять содержимое.
+
+- Работает, даже если приложение убито. **Само приложение при этом не просыпается.**
+- Запускается, только если в `aps` есть **`"mutable-content": 1`**. Без этого поля iOS показывает пуш как есть.
+  В боевом payload поля нет — для этапа 3 сервер должен добавить ровно его
+  (пример: `Scripts/payloads/fcm_call_nse.json`, отличие от `fcm_call.json` — одна строка).
+- Если расширение не успело, iOS вызывает `serviceExtensionTimeWillExpire` и показывает то, что успели изменить.
+
+Что делает расширение с пушем звонка (`type = sip_call`):
+
+| Было (с сервера) | Стало |
+|---|---|
+| «Ожидайте звонка» / «Домофон: TEST» | «📞 Входящий звонок», подзаголовок «Домофон: TEST», подсказка про кнопки |
+| `category` может не быть | `CALL_NOTIFICATION` — кнопки «Ответить» / «Отклонить» появятся всегда, даже у пуша из консоли Firebase |
+| обычный пуш | **неотложный** (`timeSensitive`) — пробивает «Не беспокоить» и фокус |
+| — | звук `customSound.wav`, стопка по `call_id` |
+| — | в `userInfo` добавлено `nse_modified: 1` — видно в журнале приложения |
+
+Расширение пишет в журнал «Расширение изменило пуш» (розовая иконка) с текстом «было / стало».
+Чтобы оно могло писать в тот же журнал, журнал лежит в общем контейнере **App Group**
+`group.com.churiqlab.PushWakeUpDemo` (до этапа 3 он был в UserDefaults приложения и переносится автоматически).
+
+Код: `NotificationService/NotificationService.swift`. В расширение подключены и общие файлы приложения:
+`EventLog.swift`, `PushNotificationData.swift`, `NotificationType.swift`, `CallNotificationCategory.swift`.
+
+**Проверка — только на iPhone.** `xcrun simctl push` расширение не запускает (проверено на iOS 26.5).
+
+```bash
+./Scripts/send_fcm_push.sh <FCM-токен> Scripts/payloads/fcm_call_nse.json
+```
+
+1. Приложение убито → пуш приходит уже с текстом «📞 Входящий звонок» и меткой «Неотложное».
+2. Откройте приложение: первая запись — «Расширение изменило пуш», состояние
+   «расширение · отдельный процесс, приложение не будится». Записи «Приложение запущено» перед ней нет.
+3. Для сравнения отправьте `fcm_call.json` (без `mutable-content`) — пуш придёт в исходном виде, записи от расширения не будет.
 
 ## Payload
 
@@ -173,7 +213,8 @@ PushWakeUpDemo/
 │   ├── CallNotificationCategory.swift           — кнопки пуша звонка
 │   └── FCMTokenStore.swift                      — последний FCM-токен
 ├── EventLog/
-│   └── EventLog.swift                           — журнал событий (переживает перезапуск)
+│   ├── EventLog.swift                           — журнал (общий с расширением, App Group)
+│   └── EventLog+AppState.swift                  — состояние приложения для журнала
 ├── Screens/
 │   ├── Main/
 │   │   ├── MainViewController.swift             — FCM-токен + журнал
@@ -181,13 +222,18 @@ PushWakeUpDemo/
 │   └── CallPreview/CallPreviewViewController.swift — экран по нажатию на пуш
 └── Resources/
     ├── GoogleService-Info.plist                 — ⚠️ не в git, добавить самому
-    ├── PushWakeUpDemo.entitlements              — aps-environment (Push Notifications)
+    ├── PushWakeUpDemo.entitlements              — push, неотложные пуши, App Group
     ├── Info.plist                               — фоновый режим remote-notification
     └── Sounds/customSound.wav
+NotificationService/
+├── NotificationService.swift                    — Notification Service Extension (этап 3)
+├── Info.plist
+└── NotificationService.entitlements             — App Group
 Scripts/
 ├── send_fcm_push.sh                             — отправка пуша через FCM HTTP v1 (как сервер)
 ├── make_app_icon.swift                          — рисует иконку приложения (swift Scripts/make_app_icon.swift)
 ├── payloads/fcm_call.json                       — боевой payload для скрипта
+├── payloads/fcm_call_nse.json                   — то же + "mutable-content": 1 (этап 3)
 ├── payloads/sip_call.apns                       — тот же пуш для симулятора (simctl)
 └── secrets/service-account.json                 — ⚠️ не в git, ключ сервисного аккаунта
 ```
@@ -215,8 +261,15 @@ Scripts/
 
 ### 2. Подпись
 
-Xcode → таргет *PushWakeUpDemo* → *Signing & Capabilities* → выбрать свою команду (*Team*).
-*Push Notifications* уже включены (`aps-environment` в entitlements).
+Xcode → *Signing & Capabilities* → выбрать свою команду (*Team*) у **обоих** таргетов:
+*PushWakeUpDemo* и *NotificationService*.
+
+Возможности уже прописаны в entitlements, Xcode с автоматической подписью зарегистрирует их сам:
+- *Push Notifications* (`aps-environment`);
+- *Time Sensitive Notifications* — для неотложных пушей;
+- *App Groups* `group.com.churiqlab.PushWakeUpDemo` — общий журнал приложения и расширения.
+
+Если меняете bundle ID — поменяйте и App Group в двух `.entitlements` и в `EventLog.appGroup`.
 
 ## Проверка на симуляторе без сервера
 

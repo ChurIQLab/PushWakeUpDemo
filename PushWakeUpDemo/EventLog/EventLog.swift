@@ -1,4 +1,4 @@
-import UIKit
+import Foundation
 
 struct AppEvent: Codable {
 
@@ -10,6 +10,7 @@ struct AppEvent: Codable {
         case answer      // нажали кнопку «Ответить» в пуше
         case decline     // нажали кнопку «Отклонить» в пуше
         case dismiss     // пуш смахнули
+        case serviceExtension // Notification Service Extension изменил пуш
         case screen      // показан экран
         case token       // получен APNs- или FCM-токен
         case permission  // ответ на запрос разрешения
@@ -44,18 +45,26 @@ struct AppEvent: Codable {
     }
 }
 
-/// Журнал событий. Хранится в UserDefaults, чтобы после холодного старта
-/// (приложение было убито, нажали на пуш) было видно, что произошло.
+/// Журнал событий. Общий для приложения и Notification Service Extension:
+/// расширение — отдельный процесс, поэтому журнал лежит в App Group, а не в UserDefaults приложения.
+/// Хранится между запусками, чтобы после холодного старта было видно, что произошло.
 enum EventLog {
     static let didChangeNotification = Notification.Name("EventLogDidChange")
 
+    /// Должен совпадать с App Group в entitlements приложения и расширения.
+    static let appGroup = "group.com.churiqlab.PushWakeUpDemo"
+
+    /// Кто пишет в журнал и в каком он состоянии. Приложение подставляет
+    /// «активно / в фоне / холодный старт», расширение — своё описание.
+    static var stateProvider: () -> String? = { nil }
+
     private static let key = "event_log"
     private static let limit = 200
-    private static let launchDate = Date()
+    private static let storage = UserDefaults(suiteName: appGroup) ?? .standard
 
-    /// Добавляет событие с текущим состоянием приложения. Вызывать на главном потоке.
+    /// Добавляет событие. В приложении вызывать на главном потоке.
     static func add(_ kind: AppEvent.Kind, _ title: String, details: String? = nil) {
-        let event = AppEvent(date: Date(), kind: kind, title: title, details: details, appState: appStateDescription)
+        let event = AppEvent(date: Date(), kind: kind, title: title, details: details, appState: stateProvider())
         print("📝 \(title) [\(event.appState ?? "")]\(details.map { " — \($0)" } ?? "")")
 
         var events = all()
@@ -64,7 +73,8 @@ enum EventLog {
     }
 
     static func all() -> [AppEvent] {
-        guard let data = UserDefaults.standard.data(forKey: key) else { return [] }
+        migrateFromStandardDefaultsIfNeeded()
+        guard let data = storage.data(forKey: key) else { return [] }
         return (try? JSONDecoder().decode([AppEvent].self, from: data)) ?? []
     }
 
@@ -72,26 +82,18 @@ enum EventLog {
         save([])
     }
 
-    /// Вызвать в начале didFinishLaunching, чтобы отсчёт «холодного старта» шёл от запуска.
-    static func markLaunch() {
-        _ = launchDate
-    }
-
     private static func save(_ events: [AppEvent]) {
-        UserDefaults.standard.set(try? JSONEncoder().encode(events), forKey: key)
+        storage.set(try? JSONEncoder().encode(events), forKey: key)
         NotificationCenter.default.post(name: didChangeNotification, object: nil)
     }
 
-    private static var appStateDescription: String {
-        let state: String
-        switch UIApplication.shared.applicationState {
-        case .active: state = "активно"
-        case .inactive: state = "неактивно"
-        case .background: state = "в фоне"
-        @unknown default: state = "неизвестно"
+    /// До этапа 3 журнал лежал в UserDefaults приложения — переносим его один раз.
+    private static func migrateFromStandardDefaultsIfNeeded() {
+        guard storage !== UserDefaults.standard,
+              let old = UserDefaults.standard.data(forKey: key) else { return }
+        if storage.data(forKey: key) == nil {
+            storage.set(old, forKey: key)
         }
-        let uptime = Date().timeIntervalSince(launchDate)
-        guard uptime < 3 else { return state }
-        return "\(state) · холодный старт \(String(format: "%.1f", uptime)) с"
+        UserDefaults.standard.removeObject(forKey: key)
     }
 }

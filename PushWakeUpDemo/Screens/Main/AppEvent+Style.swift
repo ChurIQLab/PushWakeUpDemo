@@ -11,6 +11,7 @@ extension AppEvent.Kind {
         case .answer: return "phone.fill"
         case .decline: return "phone.down.fill"
         case .dismiss: return "hand.draw.fill"
+        case .serviceExtension: return "wand.and.stars"
         case .screen: return "rectangle.portrait.on.rectangle.portrait"
         case .token: return "key.fill"
         case .permission: return "checkmark.shield.fill"
@@ -28,6 +29,7 @@ extension AppEvent.Kind {
         case .answer: return .systemGreen
         case .decline: return .systemRed
         case .dismiss: return .systemGray
+        case .serviceExtension: return .systemPink
         case .screen: return .systemTeal
         case .token: return .systemPurple
         case .permission: return .systemGreen
