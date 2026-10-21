@@ -28,7 +28,7 @@ Code comments are in Russian.
 |---|---|---|
 | 1 | Regular push (Firebase): payload, banner while the app is open, tap → preview screen, cold start | ✅ |
 | 2 | Push action buttons (Answer / Decline) and handling a swipe-to-dismiss | ✅ |
-| 3 | Modifying the push on the device: Notification Service Extension | ✅ code · iPhone test pending |
+| 3 | Modifying the push on the device: Notification Service Extension | ✅ |
 | 4 | VoIP push: PushKit + CallKit — waking the app without user interaction | ⏳ |
 | 5 | Settings: VoIP on/off, notification permission status | ⏳ |
 
