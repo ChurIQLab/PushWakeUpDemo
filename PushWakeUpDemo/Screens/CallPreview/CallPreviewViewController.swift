@@ -1,21 +1,26 @@
 import UIKit
 
 /// Экран предпросмотра звонка: сюда попадаем по нажатию на пуш.
-/// Пока только показывает, что пришло в payload. Сам звонок — на следующих этапах.
+/// Показывает, что пришло в payload. Сам звонок (SIP, видео) в демо не делаем.
 final class CallPreviewViewController: UITableViewController {
 
     /// Как открыли экран — показываем в подписи, чтобы было видно разницу.
     enum Origin {
         case tap     // обычное нажатие на пуш
         case answer  // кнопка «Ответить» в пуше
+        case callKit // «Ответить» на экране звонка CallKit (VoIP-пуш)
 
         var subtitle: String {
             switch self {
             case .tap: return "Приложение открыто нажатием на пуш"
             case .answer: return "Приложение открыто кнопкой «Ответить» в пуше"
+            case .callKit: return "Ответили на экране звонка CallKit (VoIP-пуш)"
             }
         }
     }
+
+    /// Экран закрыли (крестиком или свайпом вниз).
+    var onClose: (() -> Void)?
 
     private let callData: PushNotificationData
     private let origin: Origin
@@ -70,6 +75,14 @@ final class CallPreviewViewController: UITableViewController {
         guard !didLogAppearance else { return }
         didLogAppearance = true
         EventLog.add(.screen, "Экран предпросмотра показан", details: "Домофон: \(callData.addr)")
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        // Экран показан внутри UINavigationController — закрывают именно его.
+        if navigationController?.isBeingDismissed == true || isBeingDismissed {
+            onClose?()
+        }
     }
 
     // MARK: - Header

@@ -43,12 +43,8 @@ extension AppDelegate: MessagingDelegate {
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         DispatchQueue.main.async {
             guard let fcmToken else { return }
-            let isNew = fcmToken != FCMTokenStore.current
-            FCMTokenStore.current = fcmToken
+            let isNew = TokenStore.save(fcmToken, for: .fcm)
             EventLog.add(.token, isNew ? "FCM-токен получен (новый)" : "FCM-токен получен (не изменился)", details: fcmToken)
-
-            // Отдельной строкой — чтобы при запуске из Xcode скопировать токен прямо из консоли.
-            print("FCM_TOKEN=\(fcmToken)")
         }
     }
 }

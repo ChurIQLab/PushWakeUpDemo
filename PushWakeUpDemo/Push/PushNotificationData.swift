@@ -48,4 +48,19 @@ struct PushNotificationData: Codable {
         }
         self = decoded
     }
+
+    /// Поля payload для журнала — по одному на строку. Без `aps` (это текст пуша для iOS)
+    /// и служебных ключей Firebase и simctl.
+    static func describe(_ userInfo: [AnyHashable: Any]) -> String {
+        let serviceKeys = ["aps", "Simulator Target Bundle", "fcm_options"]
+        return userInfo
+            .compactMap { key, value -> String? in
+                guard let key = key as? String,
+                      !serviceKeys.contains(key),
+                      !key.hasPrefix("gcm."), !key.hasPrefix("google.") else { return nil }
+                return "\(key): \(value)"
+            }
+            .sorted()
+            .joined(separator: "\n")
+    }
 }

@@ -18,7 +18,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         let userInfo = notification.request.content.userInfo
         DispatchQueue.main.async {
             EventLog.add(.push, "Пуш пришёл при открытом приложении",
-                         details: "Показываем баннер\n\(Self.describe(userInfo))")
+                         details: "Показываем баннер\n\(PushNotificationData.describe(userInfo))")
             completionHandler([.banner, .list, .badge, .sound])
         }
     }
@@ -34,11 +34,11 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             defer { completionHandler() }
 
             guard NotificationType(userInfo: userInfo) == .sipCall else {
-                EventLog.add(.warning, "Действие с пушем, но это не звонок", details: Self.describe(userInfo))
+                EventLog.add(.warning, "Действие с пушем, но это не звонок", details: PushNotificationData.describe(userInfo))
                 return
             }
             guard let callData = PushNotificationData(userInfo: userInfo) else {
-                EventLog.add(.error, "Не удалось разобрать payload", details: Self.describe(userInfo))
+                EventLog.add(.error, "Не удалось разобрать payload", details: PushNotificationData.describe(userInfo))
                 return
             }
 
@@ -75,7 +75,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     /// При холодном старте `didReceive` приходит, пока приложение ещё неактивно
     /// и главный экран не успел появиться — `present` в этот момент молча не срабатывает.
     /// Поэтому запоминаем звонок и показываем экран, когда приложение станет активным.
-    private func showCallPreview(with callData: PushNotificationData, origin: CallPreviewViewController.Origin) {
+    func showCallPreview(with callData: PushNotificationData, origin: CallPreviewViewController.Origin) {
         pendingCallPreview = (callData, origin)
         if UIApplication.shared.applicationState == .active {
             presentPendingCallPreview()
@@ -91,21 +91,13 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             topViewController = presented
         }
         let preview = CallPreviewViewController(callData: callData, origin: origin)
+        if origin == .callKit {
+            // Звонок в CallKit идёт, пока открыт предпросмотр, — закрыли экран, завершаем звонок.
+            preview.onClose = { [weak self] in
+                self?.callKitService.endCall(callID: callData.callID)
+            }
+        }
         topViewController?.present(UINavigationController(rootViewController: preview), animated: true)
     }
 
-    /// Поля payload для журнала — по одному на строку. Без `aps` (это текст пуша для iOS)
-    /// и служебных ключей Firebase и simctl.
-    private static func describe(_ userInfo: [AnyHashable: Any]) -> String {
-        let serviceKeys = ["aps", "Simulator Target Bundle", "fcm_options"]
-        return userInfo
-            .compactMap { key, value -> String? in
-                guard let key = key as? String,
-                      !serviceKeys.contains(key),
-                      !key.hasPrefix("gcm."), !key.hasPrefix("google.") else { return nil }
-                return "\(key): \(value)"
-            }
-            .sorted()
-            .joined(separator: "\n")
-    }
 }
