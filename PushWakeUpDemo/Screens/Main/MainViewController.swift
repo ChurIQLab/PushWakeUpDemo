@@ -55,7 +55,7 @@ final class MainViewController: UITableViewController {
         })
 
         NotificationCenter.default.addObserver(self, selector: #selector(reload), name: EventLog.didChangeNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(reload), name: FCMTokenStore.didChangeNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reload), name: TokenStore.didChangeNotification, object: nil)
         reload()
     }
 
@@ -99,24 +99,25 @@ final class MainViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard section != tokenSection, !days.isEmpty else { return 1 }
+        if section == tokenSection { return PushToken.allCases.count }
+        guard !days.isEmpty else { return 1 }
         return days[section - 1].events.count
     }
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if section == tokenSection { return "FCM-токен" }
+        if section == tokenSection { return "Токены" }
         if days.isEmpty { return "Журнал" }
         return title(for: days[section - 1].date)
     }
 
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         guard section == tokenSection else { return nil }
-        return "Нажмите, чтобы скопировать или отправить AirDrop. Токен также печатается в консоль Xcode: FCM_TOKEN=…"
+        return "Нажмите на токен, чтобы скопировать или отправить AirDrop. Токены также печатаются в консоль Xcode: FCM_TOKEN=… и VOIP_TOKEN=…"
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == tokenSection {
-            return tokenCell()
+            return tokenCell(PushToken.allCases[indexPath.row])
         }
         if days.isEmpty {
             return emptyLogCell()
@@ -126,9 +127,10 @@ final class MainViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        guard indexPath.section == tokenSection, let token = FCMTokenStore.current else { return }
+        guard indexPath.section == tokenSection,
+              let token = TokenStore.token(PushToken.allCases[indexPath.row]) else { return }
 
-        // Токен нужен на Mac (консоль Firebase или Scripts/send_fcm_push.sh):
+        // Токен нужен на Mac (консоль Firebase, Scripts/send_fcm_push.sh, Scripts/send_voip_push.sh):
         // в системном меню есть «Скопировать» и AirDrop.
         let share = UIActivityViewController(activityItems: [token], applicationActivities: nil)
         share.popoverPresentationController?.sourceView = tableView.cellForRow(at: indexPath)
@@ -137,17 +139,20 @@ final class MainViewController: UITableViewController {
 
     // MARK: - Cells
 
-    private func tokenCell() -> UITableViewCell {
+    private func tokenCell(_ kind: PushToken) -> UITableViewCell {
         let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
-        var content = UIListContentConfiguration.cell()
-        content.image = AppEvent.Kind.token.badgeImage
-        if let token = FCMTokenStore.current {
-            content.text = token
-            content.textProperties.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
+        var content = UIListContentConfiguration.subtitleCell()
+        content.image = (kind == .voip ? AppEvent.Kind.voip : AppEvent.Kind.token).badgeImage
+        content.text = kind.title
+        content.textProperties.font = .preferredFont(forTextStyle: .subheadline)
+        content.textToSecondaryTextVerticalPadding = 4
+        if let token = TokenStore.token(kind) {
+            content.secondaryText = token
+            content.secondaryTextProperties.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
             cell.accessoryView = UIImageView(image: UIImage(systemName: "square.and.arrow.up"))
         } else {
-            content.text = "Ещё не получен"
-            content.textProperties.color = .secondaryLabel
+            content.secondaryText = "Ещё не получен"
+            content.secondaryTextProperties.color = .secondaryLabel
             cell.selectionStyle = .none
         }
         cell.contentConfiguration = content

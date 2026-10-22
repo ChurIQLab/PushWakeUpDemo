@@ -11,6 +11,8 @@ struct AppEvent: Codable {
         case decline     // нажали кнопку «Отклонить» в пуше
         case dismiss     // пуш смахнули
         case serviceExtension // Notification Service Extension изменил пуш
+        case voip        // пришёл VoIP-пуш (PushKit)
+        case callKit     // показан экран звонка CallKit
         case screen      // показан экран
         case token       // получен APNs- или FCM-токен
         case permission  // ответ на запрос разрешения

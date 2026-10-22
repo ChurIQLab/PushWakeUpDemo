@@ -2,11 +2,15 @@ import UIKit
 
 /// Точка входа. Вся логика пушей разнесена по расширениям:
 /// - `AppDelegate+PushRegistration.swift` — разрешение, APNs-токен, FCM-токен;
-/// - `AppDelegate+NotificationHandling.swift` — что делать, когда пуш пришёл и когда по нему нажали.
+/// - `AppDelegate+NotificationHandling.swift` — что делать, когда пуш пришёл и когда по нему нажали;
+/// - `AppDelegate+VoIP.swift` — VoIP-пуш (PushKit) → экран звонка CallKit.
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+
+    let voipPushService = VoIPPushService()
+    let callKitService = CallKitService()
 
     /// Звонок, по пушу которого нажали, но экран ещё нельзя показать (приложение не активно).
     var pendingCallPreview: (PushNotificationData, CallPreviewViewController.Origin)?
@@ -23,6 +27,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         // Важно сделать до выхода из didFinishLaunching: если приложение запустилось
         // из-за нажатия на пуш, iOS сразу после запуска передаст это нажатие делегату.
         configurePushNotifications(for: application)
+        // VoIP-пуш, который разбудил приложение, приходит сразу после создания PushKit-реестра.
+        configureVoIP()
         return true
     }
 
